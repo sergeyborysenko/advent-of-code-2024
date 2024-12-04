@@ -25,6 +25,12 @@ var score = GetSimilarityScore(list1, list2);
 stopwatch.Stop();
 Console.WriteLine($"GetSimilarityScore. Result: {score}; Execution Time: {stopwatch.ElapsedTicks} ticks");
 
+
+stopwatch.Restart();
+score = GetSimilarityScoreOptimized(list1, list2);
+stopwatch.Stop();
+Console.WriteLine($"GetSimilarityScoreOptimized. Result: {score}; Execution Time: {stopwatch.ElapsedTicks} ticks");
+
 static int GetDistanceSum(List<int> list1, List<int> list2)
 {
     list1.Sort();
@@ -43,6 +49,21 @@ static int GetSimilarityScore(List<int> list1, List<int> list2)
     for (int i = 0; i < list1.Count; i++)
     {
         score += list2.Count(l2 => l2 == list1[i]) * list1[i];
+    }
+    return score;
+}
+
+static int GetSimilarityScoreOptimized(List<int> list1, List<int> list2)
+{
+    var score = 0;
+    Dictionary<int, int> dict = new();
+    for (int i = 0; i < list1.Count; i++)
+    {
+        if (!dict.ContainsKey(list1[i]))
+        {
+            dict.Add(list1[i], list2.Count(l2 => l2 == list1[i]) * list1[i]);
+        }
+        score += dict[list1[i]];
     }
     return score;
 }

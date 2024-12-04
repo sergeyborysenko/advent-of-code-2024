@@ -18,7 +18,12 @@ lines.ToList().ForEach(line =>
 var stopwatch = Stopwatch.StartNew();
 var sum = GetDistanceSum(list1, list2);
 stopwatch.Stop();
-Console.WriteLine($"Result: {sum}; Execution Time: {stopwatch.ElapsedTicks} ticks");
+Console.WriteLine($"GetDistanceSum. Result: {sum}; Execution Time: {stopwatch.ElapsedTicks} ticks");
+
+stopwatch.Restart();
+var score = GetSimilarityScore(list1, list2);
+stopwatch.Stop();
+Console.WriteLine($"GetSimilarityScore. Result: {score}; Execution Time: {stopwatch.ElapsedTicks} ticks");
 
 static int GetDistanceSum(List<int> list1, List<int> list2)
 {
@@ -30,4 +35,14 @@ static int GetDistanceSum(List<int> list1, List<int> list2)
         sum += Math.Abs(list1[i] - list2[i]);
     }
     return sum;
+}
+
+static int GetSimilarityScore(List<int> list1, List<int> list2)
+{
+    var score = 0;
+    for (int i = 0; i < list1.Count; i++)
+    {
+        score += list2.Count(l2 => l2 == list1[i]) * list1[i];
+    }
+    return score;
 }

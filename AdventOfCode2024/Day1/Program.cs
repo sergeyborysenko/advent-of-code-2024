@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 string filePath = "input.txt";
 var list1 = new List<int>();
@@ -56,14 +52,15 @@ static int GetSimilarityScore(List<int> list1, List<int> list2)
 static int GetSimilarityScoreOptimized(List<int> list1, List<int> list2)
 {
     var score = 0;
-    Dictionary<int, int> dict = new();
+    Dictionary<int, int> dict = [];
     for (int i = 0; i < list1.Count; i++)
     {
-        if (!dict.ContainsKey(list1[i]))
+        if (!dict.TryGetValue(list1[i], out int value))
         {
-            dict.Add(list1[i], list2.Count(l2 => l2 == list1[i]) * list1[i]);
+            value = list2.Count(l2 => l2 == list1[i]) * list1[i];
+            dict.Add(list1[i], value);
         }
-        score += dict[list1[i]];
+        score += value;
     }
     return score;
 }

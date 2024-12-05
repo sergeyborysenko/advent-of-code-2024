@@ -69,23 +69,15 @@ static bool IsSafeReportWithDampener(List<int> r, int minAdj, int maxAdj)
         var diff = r[i] - r[i - 1];
         if (diff < 0 && isAsc || diff > 0 && !isAsc)
         {
-            if (CanBeMadeSafeByRemovingOne(r, i, minAdj, maxAdj) ||
-                CanBeMadeSafeByRemovingOne(r, i-1, minAdj, maxAdj) ||
+            return (CanBeMadeSafeByRemovingOne(r, i, minAdj, maxAdj) ||
+                CanBeMadeSafeByRemovingOne(r, i - 1, minAdj, maxAdj) ||
                 // Edge case when direction is wrong from the start
-                (i == 2 && CanBeMadeSafeByRemovingOne(r, 0, minAdj, maxAdj)))
-            {
-                return true;
-            }            
-            return false;
+                (i == 2 && CanBeMadeSafeByRemovingOne(r, 0, minAdj, maxAdj)));            
         }
         if (Math.Abs(diff) < minAdj || Math.Abs(diff) > maxAdj)
         {
-            if (CanBeMadeSafeByRemovingOne(r, i, minAdj, maxAdj) ||
-                CanBeMadeSafeByRemovingOne(r, i - 1, minAdj, maxAdj))
-            {
-                return true;
-            }
-            return false;
+            return (CanBeMadeSafeByRemovingOne(r, i, minAdj, maxAdj) ||
+                CanBeMadeSafeByRemovingOne(r, i - 1, minAdj, maxAdj));
         }
         i++;
     }

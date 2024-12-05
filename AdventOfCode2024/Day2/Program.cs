@@ -1,5 +1,6 @@
 ﻿
 using System.Diagnostics;
+using System.Linq;
 using Xunit;
 
 string filePath = "input.txt";
@@ -15,14 +16,20 @@ lines.ToList().ForEach(line =>
 });
 
 var stopwatch = Stopwatch.StartNew();
-var count = CountSafeReports(reports, minAdj, maxAdj);
-
+var count = CountSafeReports(reports, minAdj, maxAdj, false);
 stopwatch.Stop();
 Console.WriteLine($"CountSafeReports. Result: {count}; Execution Time: {stopwatch.ElapsedTicks} ticks");
 
-static int CountSafeReports(List<List<int>> reports, int minAdj, int maxAdj)
+stopwatch.Restart();
+count = CountSafeReports(reports, minAdj, maxAdj, true);
+stopwatch.Stop();
+Console.WriteLine($"CountSafeReports with Problem Dampener. Result: {count}; Execution Time: {stopwatch.ElapsedTicks} ticks");
+
+static int CountSafeReports(List<List<int>> reports, int minAdj, int maxAdj, bool withDampener)
 {
-    return reports.Count( r => IsSafeReport(r, minAdj, maxAdj));
+    return withDampener ?
+        reports.Count(r => IsSafeReportWithDampener(r, minAdj, maxAdj)) :
+        reports.Count( r => IsSafeReport(r, minAdj, maxAdj));
 }
 
 static bool IsSafeReport(List<int> r, int minAdj, int maxAdj)
@@ -47,4 +54,47 @@ static bool IsSafeReport(List<int> r, int minAdj, int maxAdj)
         i++;
     }
     return true;
+}
+
+static bool IsSafeReportWithDampener(List<int> r, int minAdj, int maxAdj)
+{
+    if (r.Count < 2)
+    {
+        return true;
+    }
+    bool isAsc = r[0] <= r[1];
+    var i = 1;
+    while (i < r.Count)
+    {
+        var diff = r[i] - r[i - 1];
+        if (diff < 0 && isAsc || diff > 0 && !isAsc)
+        {
+            if (CanBeMadeSafeByRemovingOne(r, i, minAdj, maxAdj) ||
+                CanBeMadeSafeByRemovingOne(r, i-1, minAdj, maxAdj) ||
+                // Edge case when direction is wrong from the start
+                (i == 2 && CanBeMadeSafeByRemovingOne(r, 0, minAdj, maxAdj)))
+            {
+                return true;
+            }            
+            return false;
+        }
+        if (Math.Abs(diff) < minAdj || Math.Abs(diff) > maxAdj)
+        {
+            if (CanBeMadeSafeByRemovingOne(r, i, minAdj, maxAdj) ||
+                CanBeMadeSafeByRemovingOne(r, i - 1, minAdj, maxAdj))
+            {
+                return true;
+            }
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+static bool CanBeMadeSafeByRemovingOne(List<int> r, int index, int minAdj, int maxAdj)
+{
+    var copy = r.ToList();
+    copy.RemoveAt(index);
+    return IsSafeReport(copy, minAdj, maxAdj);
 }

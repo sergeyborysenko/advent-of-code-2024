@@ -1,7 +1,5 @@
 ﻿
 using System.Diagnostics;
-using System.Linq;
-using Xunit;
 
 string filePath = "input.txt";
 const int minAdj = 1;

@@ -22,7 +22,7 @@ for (int i = 0; i < lines.Length; i++)
                 mat[i, j] = 0;
                 break;
             case '#':
-                mat[i, j] = 2;
+                mat[i, j] = -1;
                 break;
             case '^':
                 mat[i, j] = 0;
@@ -38,7 +38,12 @@ for (int i = 0; i < lines.Length; i++)
 var stopwatch = Stopwatch.StartNew();
 var result = GetDistinctPositionsCount(mat, x, y, direction);
 stopwatch.Stop();
-Console.WriteLine($"{nameof(GetDistinctPositionsCount)}. Result: {result}; Execution Time: {stopwatch.ElapsedTicks} ticks");
+Console.WriteLine($"{nameof(GetDistinctPositionsCount)}. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
+
+stopwatch.Restart();
+result = GetDistinctLoopObstaclePositionsCount(mat, x, y, direction);
+stopwatch.Stop();
+Console.WriteLine($"{nameof(GetDistinctLoopObstaclePositionsCount)}. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
 
 int GetDistinctPositionsCount(int[,] mat, int x, int y, int[] direction)
 {
@@ -52,12 +57,72 @@ int GetDistinctPositionsCount(int[,] mat, int x, int y, int[] direction)
             x += direction[0];
             y += direction[1];
         }
-        else if (mat[x,y] == 1) // visited
+        else if (mat[x,y] >= 1) // visited
         {
+            mat[x, y]++;
             x += direction[0];
             y += direction[1];
         }
-        else if (mat[x,y] == 2) // obstacle
+        else if (mat[x,y] == -1) // obstacle
+        {
+            // get one step back
+            x -= direction[0];
+            y -= direction[1];
+            // turn right
+            direction = [direction[1], -1 * direction[0]];
+        }
+        if (x < 0 || x >= Width || y < 0 || y >= Height)
+        {
+            break;
+        }
+    }    
+    return result;
+}
+
+int GetDistinctLoopObstaclePositionsCount(int[,] mat, int x, int y, int[] direction)
+{
+    int result = 0;
+    for (int i = 0; i < Width; i++)
+    {
+        for (int j = 0; j < Height; j++)
+        {
+            if (mat[i, j] != -1 && !(i == x && j == y))
+            {
+                mat[i, j] = -1;
+                if (IsLoopDetected(CopyMatrix(mat), x, y, [-1, 0]))
+                {
+                    result++;
+                }
+                mat[i, j] = 0;
+            }
+        }
+    }
+
+    return result;
+}
+
+bool IsLoopDetected(int[,] mat, int x, int y, int[] direction)
+{
+    while (true)
+    {
+        if (mat[x, y] == 0) // not visited
+        {
+            result++;
+            mat[x, y] = 1;
+            x += direction[0];
+            y += direction[1];
+        }
+        else if (mat[x, y] >= 1) // visited
+        {
+            mat[x, y]++;
+            if (mat[x, y] == 10) // Assume loop detected
+            {
+                return true;
+            }
+            x += direction[0];
+            y += direction[1];            
+        }
+        else if (mat[x, y] == -1) // obstacle
         {
             // get one step back
             x -= direction[0];
@@ -70,5 +135,18 @@ int GetDistinctPositionsCount(int[,] mat, int x, int y, int[] direction)
             break;
         }
     }
-    return result;
+    return false;
+}
+
+int[,] CopyMatrix(int[,] mat)
+{
+    int[,] copy = new int[Width, Height];
+    for (int i = 0; i < Width; i++)
+    {
+        for (int j = 0; j < Height; j++)
+        {
+            copy[i, j] = mat[i, j];
+        }
+    }
+    return copy;
 }

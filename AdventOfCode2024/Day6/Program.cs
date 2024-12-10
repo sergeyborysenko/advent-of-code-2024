@@ -4,36 +4,13 @@ const string filePath = "input.txt";
 const int Width = 130;
 const int Height = 130;
 
-int[,] mat = new int[Width, Height];
-
 var lines = File.ReadAllLines(filePath);
+
 
 var x = 0;
 var y = 0;
 int[] direction = [-1, 0]; // up
-
-for (int i = 0; i < lines.Length; i++)
-{
-    for (int j = 0; j < lines[i].Length; j++)
-    {
-        switch (lines[i][j])
-        {
-            case '.':
-                mat[i, j] = 0;
-                break;
-            case '#':
-                mat[i, j] = -1;
-                break;
-            case '^':
-                mat[i, j] = 0;
-                x = i; 
-                y = j; // starting point
-                break;
-            default:
-                throw new Exception("Invalid character");
-        }
-    }
-}
+var mat = ParseInputToMatrix(lines, out x, out y);
 
 var stopwatch = Stopwatch.StartNew();
 var result = GetDistinctPositionsCount(mat, x, y, direction);
@@ -149,4 +126,34 @@ int[,] CopyMatrix(int[,] mat)
         }
     }
     return copy;
+}
+
+int[,] ParseInputToMatrix(string[] lines, out int x, out int y)
+{
+    int[,] mat = new int[Width, Height];
+    x = 0;
+    y = 0;
+    for (int i = 0; i < lines.Length; i++)
+    {
+        for (int j = 0; j < lines[i].Length; j++)
+        {
+            switch (lines[i][j])
+            {
+                case '.':
+                    mat[i, j] = 0;
+                    break;
+                case '#':
+                    mat[i, j] = -1;
+                    break;
+                case '^':
+                    mat[i, j] = 0;
+                    x = i;
+                    y = j; // starting point
+                    break;
+                default:
+                    throw new Exception("Invalid character");
+            }
+        }
+    }
+    return mat;
 }

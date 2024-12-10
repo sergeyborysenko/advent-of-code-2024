@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Numerics;
 
 class Operator
 {
@@ -7,6 +8,7 @@ class Operator
 
     public static Operator Sum = new() { Operation = (a, b) => a + b };
     public static Operator Mul = new() { Operation = (a, b) => a * b };
+    public static Operator Conc = new() { Operation = (a, b) => long.Parse(a.ToString() + b.ToString()) };
 }
 
 class Program
@@ -15,21 +17,25 @@ class Program
     static void Main()
     {
         var lines = File.ReadAllLines(filePath);
-
         var rows = ParseInputToRows(lines);
 
         var stopwatch = Stopwatch.StartNew();
-        var result = GetSumOfCalibratedRows(rows);
+        var result = GetSumOfCalibratedRows(rows, [Operator.Sum, Operator.Mul]);
+        stopwatch.Stop();
+        Console.WriteLine($"{nameof(GetSumOfCalibratedRows)}. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
+        
+        stopwatch.Restart();
+        result = GetSumOfCalibratedRows(rows, [Operator.Sum, Operator.Mul, Operator.Conc]);
         stopwatch.Stop();
         Console.WriteLine($"{nameof(GetSumOfCalibratedRows)}. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
     }
 
-    static long GetSumOfCalibratedRows(IEnumerable<(long Result, List<int> Numbers)> rows)
+    static long GetSumOfCalibratedRows(IEnumerable<(long Result, List<int> Numbers)> rows, Operator[] operators)
     {
         long result = 0;
         foreach (var row in rows)
         {
-            if (CanBeCalibrated(row))
+            if (CanBeCalibrated(row, operators))
             {
                 result += row.Result;
             }
@@ -37,10 +43,10 @@ class Program
         return result;
     }
 
-    static bool CanBeCalibrated((long Result, List<int> Numbers) row)
+    static bool CanBeCalibrated((long Result, List<int> Numbers) row, Operator[] operators)
     {
         var result = false;
-        var combinations = GetMatrixOfOperatorCombinations(row.Numbers.Count);
+        var combinations = GetMatrixOfOperatorCombinations(row.Numbers.Count, operators);
         foreach (var combination in combinations)
         {
             long currentResult = row.Numbers[0];
@@ -68,10 +74,10 @@ class Program
         }
     }
 
-    static List<List<Operator>> GetMatrixOfOperatorCombinations(int countOfNumbers)
+    static List<List<Operator>> GetMatrixOfOperatorCombinations(int countOfNumbers, Operator[] operators)
     {
         var results = new List<List<Operator>>();
-        GenerateCombinationsRecursive([Operator.Sum, Operator.Mul], [], countOfNumbers -1, results);
+        GenerateCombinationsRecursive(operators, [], countOfNumbers -1, results);
         return results;
     }
 

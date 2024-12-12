@@ -11,9 +11,15 @@ var lines = File.ReadAllLines(filePath);
 ParseMap(lines, mat);
 
 var stopwatch = Stopwatch.StartNew();
-var result = CountTrailheadScores(mat);
+var result = CountTrailheadSum(mat, true);
 stopwatch.Stop();
-Console.WriteLine($"{nameof(CountTrailheadScores)}. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
+Console.WriteLine($"{nameof(CountTrailheadSum)} by score. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
+
+stopwatch.Restart();
+result = CountTrailheadSum(mat, false);
+stopwatch.Stop();
+Console.WriteLine($"{nameof(CountTrailheadSum)} by rating. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
+
 Console.ReadKey();
 
 
@@ -29,20 +35,22 @@ void ParseMap(string[] lines, int[,] mat)
     }
 }
 
-int CountTrailheadScores(int[,] mat)
+int CountTrailheadSum(int[,] mat, bool byScore)
 {
-    int count = 0;
+    int sum = 0;
     for (int i = 0; i < Width; i++)
     {
         for (int j = 0; j < Height; j++)
         {
             if (mat[i, j] == 0)
             {
-                count += CountTrailheadScore(mat, i, j);
+                sum += byScore ? 
+                    CountTrailheadScore(mat, i, j) :
+                    CountTrailheadRaiting(mat, i, j);
             }
         }
     }
-    return count;
+    return sum;
 }
 
 int CountTrailheadScore(int[,] mat, int i, int j)
@@ -69,6 +77,30 @@ int CountTrailheadScore(int[,] mat, int i, int j)
 
     return score;
 }
+
+int CountTrailheadRaiting(int[,] mat, int i, int j)
+{
+    int rating = 0;
+    var currentHeight = 0;
+    var paths = new Queue<(int x, int y)>([(i, j)]);
+    while (paths.Count > 0)
+    {
+        var (x, y) = paths.Dequeue();
+        currentHeight = mat[x, y];
+        if (currentHeight == 9)
+        {
+            rating++;
+            continue;
+        }
+        TryEnqueue(paths, mat, x - 1, y, currentHeight);
+        TryEnqueue(paths, mat, x + 1, y, currentHeight);
+        TryEnqueue(paths, mat, x, y - 1, currentHeight);
+        TryEnqueue(paths, mat, x, y + 1, currentHeight);
+    }
+
+    return rating;
+}
+
 
 bool IsNextStep(int[,] mat, int i, int j, int currentHeight)
 {

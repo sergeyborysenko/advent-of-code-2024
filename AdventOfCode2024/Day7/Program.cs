@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Globalization;
-using System.Numerics;
 
 class Operator
 {

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.Tracing;
 
 const string filePath = "input.txt";
 

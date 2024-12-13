@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Numerics;
-using System.Linq;
+﻿using System.Diagnostics;
 
 const string filePath = "input.txt";
 

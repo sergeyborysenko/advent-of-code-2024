@@ -1,5 +1,4 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 string filePath = "input.txt";
 const int minAdj = 1;

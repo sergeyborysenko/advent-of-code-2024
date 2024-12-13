@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Linq;
 
 const string filePath = "input.txt";
 const int Width = 52;

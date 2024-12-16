@@ -10,25 +10,31 @@ var mat = new char[Width, Height];
 var lines = File.ReadAllLines(filePath);
 var arcades = ParseInput(lines);
 
-
 var stopwatch = Stopwatch.StartNew();
 var result = CountMinAmountTokens(arcades);
 
 stopwatch.Stop();
 Console.WriteLine($"{nameof(CountMinAmountTokens)} by score. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
+
+var arcadesWithOffset = ParseInput(lines, 10000000000000);
+stopwatch.Restart();
+result = CountMinAmountTokens(arcadesWithOffset, 0);
+
+stopwatch.Stop();
+Console.WriteLine($"{nameof(CountMinAmountTokens)} by score. Result: {result}; Execution Time: {stopwatch.ElapsedMilliseconds} miliseconds");
 Console.ReadKey();
 
-int CountMinAmountTokens(List<Arcade> arcades)
+long CountMinAmountTokens(List<Arcade> arcades, int maxPressAmounts = 100)
 {
-    var minAmountTokens = 0;
+    long minAmountTokens = 0;
     foreach (var arcade in arcades)
     {
-        minAmountTokens += arcade.CalculateNumberOfTokens();
+        minAmountTokens += arcade.CalculateNumberOfTokens(maxPressAmounts);
     }
     return minAmountTokens;
 }
 
-List<Arcade> ParseInput(string[] lines)
+List<Arcade> ParseInput(string[] lines, long prizeOffset = 0)
 {
     var arcades = new List<Arcade>();
     Arcade? currentArcade = null;
@@ -67,7 +73,7 @@ List<Arcade> ParseInput(string[] lines)
             var x = int.Parse(coordinates[0].Split('=')[1]);
             var y = int.Parse(coordinates[1].Split('=')[1]);
             currentArcade ??= new Arcade();
-            currentArcade.Prize = (x, y);
+            currentArcade.Prize = (prizeOffset + x, prizeOffset + y);
         }
     }
 

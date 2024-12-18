@@ -53,7 +53,7 @@ List<Arcade> ParseInput(string[] lines, long prizeOffset = 0)
 
         if (line.StartsWith("Button A:"))
         {
-            var coordinates = line.Substring(9).Split(',');
+            var coordinates = line[9..].Split(',');
             var x = int.Parse(coordinates[0].Split('+')[1]);
             var y = int.Parse(coordinates[1].Split('+')[1]);
             currentArcade ??= new Arcade();
@@ -61,7 +61,7 @@ List<Arcade> ParseInput(string[] lines, long prizeOffset = 0)
         }
         else if (line.StartsWith("Button B:"))
         {
-            var coordinates = line.Substring(9).Split(',');
+            var coordinates = line[9..].Split(',');
             var x = int.Parse(coordinates[0].Split('+')[1]);
             var y = int.Parse(coordinates[1].Split('+')[1]);
             currentArcade ??= new Arcade();
@@ -69,7 +69,7 @@ List<Arcade> ParseInput(string[] lines, long prizeOffset = 0)
         }
         else if (line.StartsWith("Prize:"))
         {
-            var coordinates = line.Substring(6).Split(',');
+            var coordinates = line[6..].Split(',');
             var x = int.Parse(coordinates[0].Split('=')[1]);
             var y = int.Parse(coordinates[1].Split('=')[1]);
             currentArcade ??= new Arcade();
